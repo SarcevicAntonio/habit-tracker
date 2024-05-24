@@ -15,16 +15,21 @@
 	import {PLUGIN_NAME} from './main'
 	import {onMount} from 'svelte'
 
-	export let app: Plugin['app']
-	export let userSettings: Partial<{
-		path: string
-		lastDisplayedDate: Date
-		daysToShow: number
-		dateToHighlight: Date | undefined
-		showWeekdays: boolean
-		showNewHabitButton: boolean
-		showEmptyHabits: boolean
-	}>
+	const {
+		app,
+		userSettings,
+	}: {
+		app: Plugin['app']
+		userSettings: Partial<{
+			path: string
+			lastDisplayedDate: Date
+			daysToShow: number
+			dateToHighlight: Date | undefined
+			showWeekdays: boolean
+			showNewHabitButton: boolean
+			showEmptyHabits: boolean
+		}>
+	} = $props()
 
 	const {
 		path = 'Habits/',
@@ -42,13 +47,13 @@
 	for (let i = 0; i < daysToShow; i++) {
 		dates.unshift(subDays(lastDisplayedDate, i))
 	}
-	let innerWidth: number
-	$: datesToDisplay = innerWidth > 400 ? dates : dates.slice(-7)
+	let innerWidth = $state(1000)
+	let datesToDisplay = $derived(innerWidth > 400 ? dates : dates.slice(-7))
 
 	let habits: Array<{
 		file: TFile
 		entries: string[]
-	}> = []
+	}> = $state([])
 	function updateHabits() {
 		habits = app.vault
 			.getMarkdownFiles()
@@ -69,16 +74,18 @@
 			})
 	}
 	updateHabits()
-	$: habitsToDisplay = showEmptyHabits
-		? habits
-		: habits.filter((habit) => {
-				for (const date of datesToDisplay) {
-					if (habit.entries.includes(getDateId(date))) {
-						return true
+	let habitsToDisplay = $derived(
+		showEmptyHabits
+			? habits
+			: habits.filter((habit) => {
+					for (const date of datesToDisplay) {
+						if (habit.entries.includes(getDateId(date))) {
+							return true
+						}
 					}
-				}
-				return false
-			})
+					return false
+				}),
+	)
 
 	function toggleHabit(habit: (typeof habits)[number], date: Date) {
 		const dateString = getDateId(date)
@@ -141,7 +148,7 @@
 				{#if showNewHabitButton}
 					<button
 						class="newHabitButton"
-						on:click={handleNewHabit}
+						onclick={handleNewHabit}
 					>
 						➕
 					</button>
@@ -197,7 +204,7 @@
 						class:previousDayChecked
 						class:nextDayChecked
 					>
-						<button on:click={() => toggleHabit(habit, date)}>
+						<button onclick={() => toggleHabit(habit, date)}>
 							{checked ? 'Uncheck' : 'Check'}
 							{habitName}
 						</button>
@@ -220,7 +227,7 @@
 
 	<button
 		class="newHabitButton"
-		on:click={handleNewHabit}
+		onclick={handleNewHabit}
 	>
 		➕ Add a new habit
 	</button>
@@ -267,15 +274,15 @@
 	}
 
 	.weekend {
-		background-color: var(--color-base-05);
+		background-color: var(--color-base-05) !important;
 	}
 
 	.highlighted {
-		background-color: var(--color-base-20);
+		background-color: var(--color-base-20) !important;
 	}
 
 	.today {
-		background-color: hsla(var(--interactive-accent-hsl), 10%);
+		background-color: hsla(var(--interactive-accent-hsl), 10%) !important;
 	}
 
 	tr:has(td:hover) th,
