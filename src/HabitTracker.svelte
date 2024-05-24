@@ -135,78 +135,82 @@
 <svelte:window bind:innerWidth />
 
 <table style:--datesToDisplay={datesToDisplay.length}>
-	<tr>
-		<th>
-			{#if showNewHabitButton}
-				<button
-					class="newHabitButton"
-					on:click={handleNewHabit}
-				>
-					➕
-				</button>
-			{/if}
-		</th>
-		{#each datesToDisplay as date}
-			<th
-				class="days"
-				class:weekend={isSaturday(date) || isSunday(date)}
-				class:today={isToday(date)}
-				class:highlighted={dateToHighlight
-					? isSameDay(date, dateToHighlight)
-					: undefined}
-			>
-				{#if showWeekdays}
-					{[undefined, 'M', 'T', 'W', 'T', 'F', 'S', 'S'][getISODay(date)]}
-				{:else}
-					{getDate(date)}
-				{/if}
-			</th>
-		{/each}
-	</tr>
-
-	{#each habitsToDisplay as habit}
-		{@const habitName = habit.file.name.replace('.md', '')}
+	<thead>
 		<tr>
 			<th>
-				<a
-					class="internal-link"
-					href={habit.file.path}
-				>
-					{habitName}
-				</a>
+				{#if showNewHabitButton}
+					<button
+						class="newHabitButton"
+						on:click={handleNewHabit}
+					>
+						➕
+					</button>
+				{/if}
 			</th>
 			{#each datesToDisplay as date}
-				{@const checked = habit.entries.contains(getDateId(date))}
-				{@const previousDayChecked = habit.entries.contains(
-					getDateId(subDays(date, 1)),
-				)}
-				{@const nextDayChecked = habit.entries.contains(
-					getDateId(addDays(date, 1)),
-				)}
-				{@const isStreakEnd = previousDayChecked && checked && !nextDayChecked}
-				<td
-					class:today={isToday(date)}
+				<th
+					class="days"
 					class:weekend={isSaturday(date) || isSunday(date)}
+					class:today={isToday(date)}
 					class:highlighted={dateToHighlight
 						? isSameDay(date, dateToHighlight)
 						: undefined}
-					class:checked
-					class:previousDayChecked
-					class:nextDayChecked
 				>
-					<button on:click={() => toggleHabit(habit, date)}>
-						{checked ? 'Uncheck' : 'Check'}
-						{habitName}
-					</button>
-					{#if isStreakEnd}
-						<span class="streak">
-							{countStreak(habit.entries, date)}
-						</span>
+					{#if showWeekdays}
+						{[undefined, 'M', 'T', 'W', 'T', 'F', 'S', 'S'][getISODay(date)]}
+					{:else}
+						{getDate(date)}
 					{/if}
-				</td>
+				</th>
 			{/each}
 		</tr>
-	{/each}
+	</thead>
+	<tbody>
+		{#each habitsToDisplay as habit}
+			{@const habitName = habit.file.name.replace('.md', '')}
+			<tr>
+				<th>
+					<a
+						class="internal-link"
+						href={habit.file.path}
+					>
+						{habitName}
+					</a>
+				</th>
+				{#each datesToDisplay as date}
+					{@const checked = habit.entries.contains(getDateId(date))}
+					{@const previousDayChecked = habit.entries.contains(
+						getDateId(subDays(date, 1)),
+					)}
+					{@const nextDayChecked = habit.entries.contains(
+						getDateId(addDays(date, 1)),
+					)}
+					{@const isStreakEnd =
+						previousDayChecked && checked && !nextDayChecked}
+					<td
+						class:today={isToday(date)}
+						class:weekend={isSaturday(date) || isSunday(date)}
+						class:highlighted={dateToHighlight
+							? isSameDay(date, dateToHighlight)
+							: undefined}
+						class:checked
+						class:previousDayChecked
+						class:nextDayChecked
+					>
+						<button on:click={() => toggleHabit(habit, date)}>
+							{checked ? 'Uncheck' : 'Check'}
+							{habitName}
+						</button>
+						{#if isStreakEnd}
+							<span class="streak">
+								{countStreak(habit.entries, date)}
+							</span>
+						{/if}
+					</td>
+				{/each}
+			</tr>
+		{/each}
+	</tbody>
 </table>
 
 {#if habits.length === 0}
@@ -237,6 +241,8 @@
 			);
 	}
 
+	thead,
+	tbody,
 	tr {
 		display: contents;
 	}

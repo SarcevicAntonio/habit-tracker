@@ -21,7 +21,7 @@
 		"esbuild-svelte": "^0.8.0",
 		"fs-extra": "^11.2.0",
 		"obsidian": "latest",
-		"svelte": "^4.2.17",
+		"svelte": "^5.0.0-next.141",
 		"svelte-preprocess": "^5.1.4",
 		"tslib": "2.4.0",
 		"typescript": "^5.4.5"

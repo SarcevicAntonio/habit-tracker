@@ -1,10 +1,11 @@
 import {Notice, Plugin} from 'obsidian'
+import {mount, unmount} from 'svelte'
 import HabitTracker from './HabitTracker.svelte'
 
 export const PLUGIN_NAME = 'Habit Tracker 21'
 
 export default class HabitTracker21 extends Plugin {
-	component: HabitTracker | null = null
+	component: ReturnType<typeof mount> | undefined
 
 	onload() {
 		this.registerMarkdownCodeBlockProcessor('habittracker', async (src, el) => {
@@ -21,8 +22,8 @@ export default class HabitTracker21 extends Plugin {
 				)
 			}
 
-			if (this.component) this.component.$destroy()
-			this.component = new HabitTracker({
+			if (this.component) unmount(this.component)
+			this.component = mount(HabitTracker, {
 				target: el,
 				props: {
 					app: this.app,
@@ -33,6 +34,6 @@ export default class HabitTracker21 extends Plugin {
 	}
 
 	onunload() {
-		if (this.component) this.component.$destroy()
+		if (this.component) unmount(this.component)
 	}
 }
